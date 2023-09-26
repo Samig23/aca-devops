@@ -1,0 +1,39 @@
+---
+- name: Setup WordPress using Docker
+  remote_user: ec2-user
+  hosts: 35.174.139.29
+  become: yes
+  tasks:
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+
+
+    - name: Pull WordPress image from Docker Hub
+      docker_image:
+        name: wordpress:latest
+        source: pull
+        state: present
+
+
+    - name: Start WordPress Container
+      docker_container:
+        name: my-wordpress
+        image: wordpress:latest
+        state: started
+        ports:
+          - "80:80"
+          - "3306:3306"
+        env:
+          WORDPRESS_DB_HOST: terraform-20230926130513324000000001.c5cwdkv59gfr.us-east-1.rds.amazonaws.com
+          WORDPRESS_DB_USER: admin
+          WORDPRESS_DB_PASSWORD: admin123
+          WORDPRESS_DB_NAME: mydb
+
